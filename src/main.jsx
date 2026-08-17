@@ -29,9 +29,9 @@ function App(){
  useEffect(()=>{
    const lenis=new Lenis({duration:1.05,smoothWheel:true});lenis.on('scroll',ScrollTrigger.update);let raf;const loop=t=>{lenis.raf(t);raf=requestAnimationFrame(loop)};raf=requestAnimationFrame(loop);
    const ctx=gsap.context(()=>{
-     gsap.from('.hero-main>*',{y:28,opacity:0,stagger:.09,duration:.8,ease:'power3.out'});
-     gsap.from('.hero-media',{clipPath:'inset(12% 0 0 12%)',duration:1.05,ease:'power3.out'});
-     gsap.utils.toArray('.reveal').forEach(el=>gsap.from(el,{y:32,opacity:0,duration:.75,ease:'power3.out',scrollTrigger:{trigger:el,start:'top 88%'}}));
+     gsap.from('.hero-main>*',{y:26,opacity:0,stagger:.08,duration:.8,ease:'power3.out'});
+     gsap.from('.hero-media',{clipPath:'inset(10% 0 0 10%)',duration:1.05,ease:'power3.out'});
+     gsap.utils.toArray('.reveal').forEach(el=>gsap.from(el,{y:26,opacity:0,duration:.72,ease:'power3.out',scrollTrigger:{trigger:el,start:'top 90%'}}));
      const tl=gsap.timeline({scrollTrigger:{trigger:'.senja',start:'top top',end:'bottom bottom',scrub:1.1}});
      tl.to('.senja-scene',{backgroundColor:'#C87E68'},0)
        .to('.senja-scene',{backgroundColor:'#727C7F'},.38)
@@ -64,26 +64,26 @@ function App(){
    </section>
 
    <section className="stories" id="stories">
-     <header className="block-head reveal"><span>01 / STORIES FROM MERDEKA</span><h2>See the night<br/>before you arrive.</h2><p>Real Bazram posts, edited into one simple viewing area.</p></header>
-     <div className="stories-stage reveal"><div className="story-main"><Embed item={storyItem}/></div><aside><div className="story-info"><span>{storyItem.tag}</span><h3>{storyItem.title}</h3><p>{storyItem.copy}</p><a target="_blank" rel="noreferrer" href={`https://www.instagram.com/${storyItem.kind}/${storyItem.id}/`}>Open original ↗</a></div><div className="story-tabs">{stories.map((s,i)=><button key={s.id} className={story===i?'active':''} onClick={()=>setStory(i)}><span>0{i+1}</span>{s.tag}</button>)}</div></aside></div>
+     <header className="block-head reveal"><span>STORIES FROM MERDEKA</span><h2>See the night<br/>before you arrive.</h2><p>Real Bazram posts, edited into one simple viewing area.</p></header>
+     <div className="stories-stage reveal"><div className="story-main"><Embed item={storyItem}/></div><aside><div className="story-info"><span>{storyItem.tag}</span><h3>{storyItem.title}</h3><p>{storyItem.copy}</p><a target="_blank" rel="noreferrer" href={`https://www.instagram.com/${storyItem.kind}/${storyItem.id}/`}>Open original ↗</a></div><div className="story-tabs">{stories.map((s,i)=><button key={s.id} className={story===i?'active':''} onClick={()=>setStory(i)}>{s.tag}</button>)}</div></aside></div>
    </section>
 
    <section className="makan" id="makan">
-     <header className="block-head reveal"><span>02 / MAKAN</span><h2>Nak makan apa?</h2><p>Choose a mood, then head straight to the right zone.</p></header>
+     <header className="block-head reveal"><span>MAKAN</span><h2>Nak makan apa?</h2><p>Choose a mood, then head straight to the right zone.</p></header>
      <div className="menu-tabs">{Object.keys(menus).map(k=><button className={menu===k?'active':''} onClick={()=>setMenu(k)} key={k}>{k}</button>)}</div>
-     <div className="menu-grid reveal">{menuItems.map((x,i)=><article key={x[0]}><span>0{i+1}</span><h3>{x[0]}</h3><p>{x[1]}</p><b>{x[2]}</b></article>)}</div>
+     <div className="menu-grid reveal">{menuItems.map(x=><article key={x[0]}><h3>{x[0]}</h3><p>{x[1]}</p><b>{x[2]}</b></article>)}</div>
    </section>
 
    <section className="senja">
-     <div className="senja-scene"><div className="sun"/><div className="tower"><i className="tower-glow"/></div><div className="city"><i/><i/><i/><i/><i/><i/></div><div className="stadium-form"><span>STADIUM MERDEKA</span></div><div className="stadium-lights">{Array.from({length:14}).map((_,i)=><i key={i}/>)}</div><div className="senja-copy"><span>03 / THE SHIFT</span><h2>FROM SENJA<br/>TO MALAM.</h2><p className="clock time-one">5:40 PM · warm light across the field</p><p className="clock time-two">7:05 PM · first lights come on</p><p className="clock time-three">8:00 PM · Bazram after dark</p></div></div>
+     <div className="senja-scene"><div className="sun"/><div className="tower"><i className="tower-glow"/></div><div className="city"><i/><i/><i/><i/><i/><i/></div><div className="stadium-form"><span>STADIUM MERDEKA</span></div><div className="stadium-lights">{Array.from({length:14}).map((_,i)=><i key={i}/>)}</div><div className="senja-copy"><span>THE SHIFT</span><h2>FROM SENJA<br/>TO MALAM.</h2><p className="clock time-one">5:40 PM · warm light across the field</p><p className="clock time-two">7:05 PM · first lights come on</p><p className="clock time-three">8:00 PM · Bazram after dark</p></div></div>
    </section>
 
    <section className="plan" id="plan">
-     <header className="block-head reveal"><span>04 / PLAN YOUR NIGHT</span><h2>Know where to go.<br/>Then relax.</h2><p>Everything useful in one section.</p></header>
-     <div className="plan-grid reveal"><div className="timeline">{[['4:00','Gates open'],['5:30','Best time to browse food'],['7:20','Settle in for iftar'],['7:30','Communal iftar'],['8:15','Night programme & moreh']].map(x=><div><b>{x[0]}</b><span>{x[1]}</span></div>)}</div><div className="map"><div className="map-ring outer"/><div className="map-ring inner"/><div className="field">IFTAR FIELD</div><span className="pin p1">HOT FOOD</span><span className="pin p2">DRINKS</span><span className="pin p3">PICNIC</span><span className="pin p4">PRAYER</span></div></div>
+     <header className="block-head reveal"><span>PLAN YOUR NIGHT</span><h2>Know where to go.<br/>Then relax.</h2><p>Everything useful in one section.</p></header>
+     <div className="plan-grid reveal"><div className="timeline">{[['4:00','Gates open'],['5:30','Best time to browse food'],['7:20','Settle in for iftar'],['7:30','Communal iftar'],['8:15','Night programme & moreh']].map(x=><div key={x[0]}><b>{x[0]}</b><span>{x[1]}</span></div>)}</div><div className="zone-guide"><h3>Stadium guide</h3><p><b>Hot food</b><span>West concourse</span></p><p><b>Drinks</b><span>North & east concourse</span></p><p><b>Picnic iftar</b><span>Central field</span></p><p><b>Prayer</b><span>Follow on-site signage</span></p></div></div>
    </section>
 
-   <section className="visit" id="visit"><div><span>05 / VISIT</span><h2>COME TO<br/>MERDEKA.</h2></div><div className="visit-info"><p><b>WHERE</b><br/>Stadium Merdeka<br/>Kuala Lumpur</p><p><b>WHEN</b><br/>Daily<br/>4PM — 11PM</p><p><b>GETTING HERE</b><br/>Public transport<br/>recommended</p></div><a target="_blank" rel="noreferrer" href="https://www.instagram.com/bazrammerdeka/">FOLLOW @BAZRAMMERDEKA ↗</a></section>
+   <section className="visit" id="visit"><div><span>VISIT</span><h2>COME TO<br/>MERDEKA.</h2></div><div className="visit-info"><p><b>WHERE</b><br/>Stadium Merdeka<br/>Kuala Lumpur</p><p><b>WHEN</b><br/>Daily<br/>4PM — 11PM</p><p><b>GETTING HERE</b><br/>Public transport<br/>recommended</p></div><a target="_blank" rel="noreferrer" href="https://www.instagram.com/bazrammerdeka/">FOLLOW @BAZRAMMERDEKA ↗</a></section>
  </main>
 }
 createRoot(document.getElementById('root')).render(<App/>);
