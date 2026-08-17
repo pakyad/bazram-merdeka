@@ -1,175 +1,89 @@
-import React, { useEffect, useRef } from 'react'
-import { createRoot } from 'react-dom/client'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import Lenis from 'lenis'
-import './styles.css'
+import React,{useEffect,useMemo,useRef,useState}from'react';
+import{createRoot}from'react-dom/client';
+import gsap from'gsap';
+import{ScrollTrigger}from'gsap/ScrollTrigger';
+import Lenis from'lenis';
+import'./styles.css';
 
-gsap.registerPlugin(ScrollTrigger)
+gsap.registerPlugin(ScrollTrigger);
 
-const highlights = [
-  { id:'DVSdxs5ko46', kind:'reel', label:'MAKAN', title:'THE FOOD RUN' },
-  { id:'DVm_IH5CSr_', kind:'p', label:'AFTER DARK', title:'SATU MALAM DI BAZRAM' },
-  { id:'DVnAs5Hjqgr', kind:'p', label:'BERBUKA', title:'THE FIELD FILLS UP' },
-  { id:'DVkr2vMiQ_O', kind:'p', label:'VISIT', title:'PLAN YOUR NIGHT' }
-]
+const stories=[
+ {id:'DVSdxs5ko46',kind:'reel',tag:'FOOD',title:'The Food Run',copy:'A fast look at what people came to eat.'},
+ {id:'DVm_IH5CSr_',kind:'p',tag:'NIGHT',title:'Satu Malam di Bazram',copy:'The stadium after sunset, packed and glowing.'},
+ {id:'DVnAs5Hjqgr',kind:'p',tag:'PEOPLE',title:'Berbuka Together',copy:'Families, friends and the field filling up for iftar.'},
+ {id:'DVkr2vMiQ_O',kind:'p',tag:'TIPS',title:'Plan Your Night',copy:'Useful reminders before heading to Stadium Merdeka.'}
+];
 
-const foodWords = ['SATAY','MURTABAK','AYAM PERCIK','AIR BALANG','KUIH','NASI','ROTI JOHN','ABC','KERABU']
+const menus={
+ MAINS:[['Nasi & Lauk','Filling plates for iftar','Zone A'],['Rice Bowls','Fast, familiar, easy to carry','Zone B'],['Local Favourites','Classic Ramadan comfort food','Zone C']],
+ GRILL:[['Satay','Charcoal smoke, quick bites','Zone A'],['Ayam Percik','Hot from the grill','Zone A'],['Bara Specials','Grilled meats and skewers','Zone D']],
+ DRINKS:[['Air Balang','Cold drinks for the walk','Zone B'],['Coffee','For the later hours','Zone C'],['Fruit & Soda','Easy refreshers','Zone B']],
+ SWEETS:[['Kuih','Traditional favourites','Zone C'],['ABC','Cold dessert after iftar','Zone D'],['Sweet Things','Cakes, pastries and more','Zone C']]
+};
 
-function InstagramEmbed({ item, className='' }) {
-  return <div className={`media-frame ${className}`}>
-    <div className="media-meta"><span>{item.label}</span><span>@bazrammerdeka</span></div>
-    <iframe
-      title={item.title}
-      src={`https://www.instagram.com/${item.kind}/${item.id}/embed/`}
-      loading="lazy"
-      allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-      frameBorder="0"
-    />
-  </div>
-}
+function Embed({item}){return <div className="embed-wrap"><iframe title={item.title} src={`https://www.instagram.com/${item.kind}/${item.id}/embed/`} loading="lazy" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"/></div>}
 
 function App(){
-  const root = useRef(null)
+ const root=useRef(null);const[story,setStory]=useState(0);const[menu,setMenu]=useState('MAINS');
+ const storyItem=stories[story];const menuItems=useMemo(()=>menus[menu],[menu]);
+ useEffect(()=>{
+   const lenis=new Lenis({duration:1.05,smoothWheel:true});lenis.on('scroll',ScrollTrigger.update);let raf;const loop=t=>{lenis.raf(t);raf=requestAnimationFrame(loop)};raf=requestAnimationFrame(loop);
+   const ctx=gsap.context(()=>{
+     gsap.from('.hero-main>*',{y:28,opacity:0,stagger:.09,duration:.8,ease:'power3.out'});
+     gsap.from('.hero-media',{clipPath:'inset(12% 0 0 12%)',duration:1.05,ease:'power3.out'});
+     gsap.utils.toArray('.reveal').forEach(el=>gsap.from(el,{y:32,opacity:0,duration:.75,ease:'power3.out',scrollTrigger:{trigger:el,start:'top 88%'}}));
+     const tl=gsap.timeline({scrollTrigger:{trigger:'.senja',start:'top top',end:'bottom bottom',scrub:1.1}});
+     tl.to('.senja-scene',{backgroundColor:'#C87E68'},0)
+       .to('.senja-scene',{backgroundColor:'#727C7F'},.38)
+       .to('.senja-scene',{backgroundColor:'#3F5560'},.62)
+       .to('.senja-scene',{backgroundColor:'#24363F'},1)
+       .to('.sun',{y:'42vh',opacity:.08},0)
+       .to('.stadium-lights',{opacity:1},.56)
+       .to('.time-one',{opacity:0},.25)
+       .to('.time-two',{opacity:1},.34)
+       .to('.time-two',{opacity:0},.66)
+       .to('.time-three',{opacity:1},.72)
+       .to('.tower-glow',{opacity:1},.7);
+   },root);
+   return()=>{cancelAnimationFrame(raf);ctx.revert();lenis.destroy()}
+ },[]);
+ return <main ref={root}>
+   <nav className="topnav"><a className="brand" href="#top">BAZRAM <span>MERDEKA</span></a><div className="navlinks"><a href="#stories">Stories</a><a href="#makan">Makan</a><a href="#plan">Tonight</a><a href="#visit">Visit</a></div><a className="navcta" href="#visit">Plan your night ↗</a></nav>
 
-  useEffect(()=>{
-    const lenis = new Lenis({ duration: 1.05, smoothWheel: true })
-    lenis.on('scroll', ScrollTrigger.update)
-    let raf
-    const loop = (time) => { lenis.raf(time); raf = requestAnimationFrame(loop) }
-    raf = requestAnimationFrame(loop)
+   <section className="hero" id="top">
+     <div className="hero-main"><p className="eyebrow">RAMADAN · STADIUM MERDEKA · KUALA LUMPUR</p><h1>BAZRAM<br/><span>MERDEKA</span></h1><p className="hero-copy">Food, people and a whole evening together at Stadium Merdeka.</p><div className="hero-facts"><b>21 FEB — 18 MAC</b><b>4PM — 11PM</b><b>100+ VENDORS</b></div><div className="hero-actions"><a href="#makan">Explore food</a><a href="#visit">Plan visit</a></div></div>
+     <div className="hero-media"><Embed item={stories[1]}/><div className="media-label">BAZRAM AFTER DARK · @BAZRAMMERDEKA</div></div>
+   </section>
 
-    const ctx = gsap.context(()=>{
-      gsap.timeline({ defaults:{ ease:'power3.out' } })
-        .from('.hero-kicker',{ y:18, opacity:0, duration:.6 })
-        .from('.hero-line .reveal',{ yPercent:120, duration:1.1, stagger:.08 },'-=.3')
-        .from('.hero-aside > *',{ y:20, opacity:0, duration:.7, stagger:.08 },'-=.5')
-        .from('.hero-stamp',{ scale:.72, opacity:0, rotate:-18, duration:.9 },'-=.8')
+   <section className="quick reveal">
+     <article className="quick-title"><span>WHAT'S HERE</span><h2>A lot happening.<br/>Easy to understand.</h2></article>
+     <article className="q coral"><strong>100+</strong><p>FOOD & DRINK<br/>VENDORS</p></article>
+     <article className="q green"><strong>IFTAR</strong><p>PICNIC ON THE<br/>STADIUM FIELD</p></article>
+     <article className="q blue"><strong>KL</strong><p>MERDEKA 118<br/>AFTER DARK</p></article>
+     <article className="q mango"><strong>4—11</strong><p>FROM LATE<br/>AFTERNOON</p></article>
+   </section>
 
-      gsap.to('.hero-wordmark',{ yPercent:16, ease:'none', scrollTrigger:{ trigger:'.hero', start:'top top', end:'bottom top', scrub:1 }})
-      gsap.to('.hero-stamp',{ rotate:28, ease:'none', scrollTrigger:{ trigger:'.hero', start:'top top', end:'bottom top', scrub:1 }})
-      gsap.to('.hero-skyline',{ xPercent:-8, ease:'none', scrollTrigger:{ trigger:'.hero', start:'top top', end:'bottom top', scrub:1.2 }})
+   <section className="stories" id="stories">
+     <header className="block-head reveal"><span>01 / STORIES FROM MERDEKA</span><h2>See the night<br/>before you arrive.</h2><p>Real Bazram posts, edited into one simple viewing area.</p></header>
+     <div className="stories-stage reveal"><div className="story-main"><Embed item={storyItem}/></div><aside><div className="story-info"><span>{storyItem.tag}</span><h3>{storyItem.title}</h3><p>{storyItem.copy}</p><a target="_blank" rel="noreferrer" href={`https://www.instagram.com/${storyItem.kind}/${storyItem.id}/`}>Open original ↗</a></div><div className="story-tabs">{stories.map((s,i)=><button key={s.id} className={story===i?'active':''} onClick={()=>setStory(i)}><span>0{i+1}</span>{s.tag}</button>)}</div></aside></div>
+   </section>
 
-      gsap.from('.manifesto-line',{ y:70, opacity:0, stagger:.08, duration:.9, scrollTrigger:{ trigger:'.manifesto', start:'top 70%' }})
+   <section className="makan" id="makan">
+     <header className="block-head reveal"><span>02 / MAKAN</span><h2>Nak makan apa?</h2><p>Choose a mood, then head straight to the right zone.</p></header>
+     <div className="menu-tabs">{Object.keys(menus).map(k=><button className={menu===k?'active':''} onClick={()=>setMenu(k)} key={k}>{k}</button>)}</div>
+     <div className="menu-grid reveal">{menuItems.map((x,i)=><article key={x[0]}><span>0{i+1}</span><h3>{x[0]}</h3><p>{x[1]}</p><b>{x[2]}</b></article>)}</div>
+   </section>
 
-      gsap.to('.spotlight-copy',{ yPercent:-18, ease:'none', scrollTrigger:{ trigger:'.spotlight', start:'top bottom', end:'bottom top', scrub:1 }})
-      gsap.from('.spotlight-media',{ clipPath:'inset(12% 18% 12% 18%)', scale:.93, ease:'power2.out', scrollTrigger:{ trigger:'.spotlight', start:'top 76%', end:'top 28%', scrub:1 }})
+   <section className="senja">
+     <div className="senja-scene"><div className="sun"/><div className="tower"><i className="tower-glow"/></div><div className="city"><i/><i/><i/><i/><i/><i/></div><div className="stadium-form"><span>STADIUM MERDEKA</span></div><div className="stadium-lights">{Array.from({length:14}).map((_,i)=><i key={i}/>)}</div><div className="senja-copy"><span>03 / THE SHIFT</span><h2>FROM SENJA<br/>TO MALAM.</h2><p className="clock time-one">5:40 PM · warm light across the field</p><p className="clock time-two">7:05 PM · first lights come on</p><p className="clock time-three">8:00 PM · Bazram after dark</p></div></div>
+   </section>
 
-      const rail = document.querySelector('.food-rail-track')
-      if(rail){
-        gsap.to(rail,{ x:()=>-(rail.scrollWidth - window.innerWidth + 120), ease:'none', scrollTrigger:{ trigger:'.food-rail', start:'top top', end:()=>`+=${rail.scrollWidth*.72}`, pin:true, scrub:1 }})
-      }
+   <section className="plan" id="plan">
+     <header className="block-head reveal"><span>04 / PLAN YOUR NIGHT</span><h2>Know where to go.<br/>Then relax.</h2><p>Everything useful in one section.</p></header>
+     <div className="plan-grid reveal"><div className="timeline">{[['4:00','Gates open'],['5:30','Best time to browse food'],['7:20','Settle in for iftar'],['7:30','Communal iftar'],['8:15','Night programme & moreh']].map(x=><div><b>{x[0]}</b><span>{x[1]}</span></div>)}</div><div className="map"><div className="map-ring outer"/><div className="map-ring inner"/><div className="field">IFTAR FIELD</div><span className="pin p1">HOT FOOD</span><span className="pin p2">DRINKS</span><span className="pin p3">PICNIC</span><span className="pin p4">PRAYER</span></div></div>
+   </section>
 
-      gsap.to('.night-sky',{ backgroundPosition:'0% 100%', ease:'none', scrollTrigger:{ trigger:'.nightfall', start:'top top', end:'bottom bottom', scrub:1 }})
-      gsap.fromTo('.bulb',{ opacity:.08, scale:.6 },{ opacity:1, scale:1, stagger:.05, scrollTrigger:{ trigger:'.nightfall', start:'36% center', end:'68% center', scrub:1 }})
-      gsap.to('.night-title',{ yPercent:-22, ease:'none', scrollTrigger:{ trigger:'.nightfall', start:'top top', end:'bottom bottom', scrub:1 }})
-
-      gsap.utils.toArray('.film-card').forEach((el,i)=>{
-        gsap.from(el,{ y:80 + i*18, rotate:i%2?2:-2, opacity:0, duration:.9, ease:'power3.out', scrollTrigger:{ trigger:el, start:'top 88%' }})
-      })
-
-      gsap.from('.map-line',{ scaleX:0, transformOrigin:'left center', duration:1.2, ease:'power3.inOut', scrollTrigger:{ trigger:'.visit', start:'top 70%' }})
-      gsap.from('.zone',{ y:30, opacity:0, stagger:.08, scrollTrigger:{ trigger:'.visit-map', start:'top 70%' }})
-    },root)
-
-    return ()=>{ cancelAnimationFrame(raf); ctx.revert(); lenis.destroy() }
-  },[])
-
-  return <main ref={root}>
-    <nav className="nav">
-      <a href="#top" className="brand"><span>BAZRAM</span><small>MERDEKA</small></a>
-      <div className="nav-center"><a href="#story">STORY</a><a href="#makan">MAKAN</a><a href="#live">LIVE</a><a href="#visit">VISIT</a></div>
-      <a className="nav-cta" href="#visit">STADIUM MERDEKA ↗</a>
-    </nav>
-
-    <section className="hero" id="top">
-      <div className="grain" />
-      <div className="hero-grid" />
-      <div className="hero-skyline" aria-hidden="true"><i/><i/><i/><i/><i/><i/><i/></div>
-      <div className="hero-wordmark">
-        <p className="hero-kicker">RAMADAN / KUALA LUMPUR / STADIUM MERDEKA</p>
-        <h1>
-          <span className="hero-line"><span className="reveal">BAZRAM</span></span>
-          <span className="hero-line accent"><span className="reveal">MERDEKA</span></span>
-        </h1>
-      </div>
-      <div className="hero-aside">
-        <p>21 FEB — 18 MAC 2026</p>
-        <p>4 PETANG — 11 MALAM</p>
-        <p>100+ VENDOR / PICNIC IFTAR / KL AFTER DARK</p>
-      </div>
-      <div className="hero-stamp"><span>BAZRAM</span><b>KL</b><span>2026</span></div>
-      <div className="hero-footer"><span>SCROLL TO ENTER</span><span>03.1390° N / 101.7006° E</span></div>
-    </section>
-
-    <section className="manifesto" id="story">
-      <p className="manifesto-index">01 — BUKAN SEKADAR BAZAAR</p>
-      <div className="manifesto-copy">
-        <span className="manifesto-line">A NIGHT MARKET.</span>
-        <span className="manifesto-line serif">A CITY RITUAL.</span>
-        <span className="manifesto-line">A FIELD FULL OF PEOPLE.</span>
-      </div>
-      <p className="manifesto-note">Old Stadium Merdeka. New KL energy. Food smoke, paper cups, families on the field, lights coming on one row at a time.</p>
-    </section>
-
-    <section className="spotlight" id="live">
-      <div className="spotlight-copy">
-        <p className="section-index">02 — FROM THE FEED</p>
-        <h2>DON'T SHOW<br/>THE EVENT.<br/><em>DROP ME IN.</em></h2>
-        <p className="section-note">Real Bazram footage becomes the artwork. No fake stock cards. No generic festival UI.</p>
-      </div>
-      <div className="spotlight-media"><InstagramEmbed item={highlights[0]} className="hero-embed"/></div>
-      <div className="spotlight-caption">THE FOOD RUN / @BAZRAMMERDEKA / 2026</div>
-    </section>
-
-    <section className="food-rail" id="makan">
-      <div className="food-rail-track">
-        <article className="rail-intro"><p>03 — NAK MAKAN APA?</p><h2>FOLLOW<br/>THE<br/><span>SMOKE.</span></h2><small>DRAG YOUR EYES. KEEP SCROLLING.</small></article>
-        {foodWords.map((name,i)=><article className={`food-poster p${i%4}`} key={name}>
-          <div className="poster-num">{String(i+1).padStart(2,'0')}</div>
-          <div className="poster-shape"><i/><i/><i/></div>
-          <h3>{name}</h3>
-          <p>{['BARA / PANAS / MALAM','SEJUK / MANIS / RAMAI','KLASIK / CEPAT / PADAT','LAMA / BARU / SAMA-SAMA'][i%4]}</p>
-        </article>)}
-      </div>
-    </section>
-
-    <section className="nightfall">
-      <div className="night-sky">
-        <div className="night-title"><p>04 — WAKTU BERUBAH</p><h2>SENJA<br/><em>JADI</em><br/>MALAM.</h2></div>
-        <div className="sun-disc"/>
-        <div className="stadium-ring"><span>STADIUM MERDEKA</span></div>
-        <div className="bulbs">{Array.from({length:24}).map((_,i)=><i className="bulb" key={i}/>)}</div>
-      </div>
-    </section>
-
-    <section className="film" id="feed">
-      <header className="film-head"><p>05 — REAL MOMENTS</p><h2>THE FEED,<br/><em>RE-CUT.</em></h2></header>
-      <div className="film-strip">
-        {highlights.slice(1).map((item,i)=><article className="film-card" key={item.id}>
-          <div className="film-number">0{i+1}</div>
-          <InstagramEmbed item={item}/>
-          <div className="film-copy"><p>{item.label}</p><h3>{item.title}</h3><a target="_blank" rel="noreferrer" href={`https://www.instagram.com/${item.kind}/${item.id}/`}>OPEN ORIGINAL ↗</a></div>
-        </article>)}
-      </div>
-    </section>
-
-    <section className="visit" id="visit">
-      <div className="visit-copy"><p>06 — FIND YOUR WAY IN</p><h2>STADIUM<br/>MERDEKA.</h2><div className="map-line"/><p className="visit-meta">KUALA LUMPUR · 4PM–11PM · RAMADAN 2026</p></div>
-      <div className="visit-map">
-        <div className="ring r1"/><div className="ring r2"/><div className="field">IFtar field</div>
-        <div className="zone z1"><b>A</b><span>HOT FOOD</span></div>
-        <div className="zone z2"><b>B</b><span>DRINKS</span></div>
-        <div className="zone z3"><b>C</b><span>PICNIC</span></div>
-        <div className="zone z4"><b>D</b><span>FOOD TRUCKS</span></div>
-      </div>
-    </section>
-
-    <footer>
-      <div><p>BAZRAM MERDEKA</p><h2>JUMPA<br/><em>MALAM.</em></h2></div>
-      <div className="footer-meta"><a href="https://www.instagram.com/bazrammerdeka/" target="_blank" rel="noreferrer">INSTAGRAM ↗</a><span>STADIUM MERDEKA · KL</span><span>2026</span></div>
-    </footer>
-  </main>
+   <section className="visit" id="visit"><div><span>05 / VISIT</span><h2>COME TO<br/>MERDEKA.</h2></div><div className="visit-info"><p><b>WHERE</b><br/>Stadium Merdeka<br/>Kuala Lumpur</p><p><b>WHEN</b><br/>Daily<br/>4PM — 11PM</p><p><b>GETTING HERE</b><br/>Public transport<br/>recommended</p></div><a target="_blank" rel="noreferrer" href="https://www.instagram.com/bazrammerdeka/">FOLLOW @BAZRAMMERDEKA ↗</a></section>
+ </main>
 }
-
-createRoot(document.getElementById('root')).render(<App />)
+createRoot(document.getElementById('root')).render(<App/>);
