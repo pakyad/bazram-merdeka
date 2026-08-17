@@ -9,383 +9,381 @@ gsap.registerPlugin(ScrollTrigger)
 
 const LOGO = '/bazram-logo.webp'
 
-const highlights = [
-  { id: 'DVSdxs5ko46', kind: 'reel', label: 'Food run', title: 'Bazram food run' },
-  { id: 'DVnAs5Hjqgr', kind: 'p', label: 'Iftar', title: 'Iftar on the field' },
-]
+const photos = {
+  iftar: {
+    src: 'https://www.instagram.com/p/DVnAs5Hjqgr/media/?size=l',
+    href: 'https://www.instagram.com/p/DVnAs5Hjqgr/',
+    alt: 'Bazram Merdeka communal iftar at Stadium Merdeka',
+  },
+  night: {
+    src: 'https://www.instagram.com/p/DVm_IH5CSr_/media/?size=l',
+    href: 'https://www.instagram.com/p/DVm_IH5CSr_/',
+    alt: 'Bazram Merdeka after dark at Stadium Merdeka',
+  },
+  visit: {
+    src: 'https://www.instagram.com/p/DVkr2vMiQ_O/media/?size=l',
+    href: 'https://www.instagram.com/p/DVkr2vMiQ_O/',
+    alt: 'Bazram Merdeka visitor information post',
+  },
+}
 
-const foodGroups = [
+const foodTabs = [
   {
     id: 'hot',
     label: 'Hot food',
-    title: 'Hot food',
-    copy: 'Grills, rice dishes, noodles, murtabak, roti and the Ramadan staples people come hungry for.',
-    items: ['Satay', 'Ayam percik', 'Murtabak', 'Roti John'],
+    title: 'Fresh off the grill',
+    text: 'Satay, ayam percik, murtabak, roti, rice dishes, noodles and the familiar Ramadan favourites people queue for.',
+    chips: ['Satay', 'Ayam percik', 'Murtabak', 'Roti John'],
   },
   {
     id: 'sweet',
     label: 'Sweet',
-    title: 'Sweet + cold',
-    copy: 'Kuih, cold desserts and sweet bites for after iftar or a quick stop before heading home.',
-    items: ['Kuih', 'ABC', 'Desserts', 'Bakes'],
+    title: 'Something manis',
+    text: 'Kuih, cold desserts and easy sweet bites for after iftar or the walk back out of the stadium.',
+    chips: ['Kuih', 'ABC', 'Desserts', 'Bakes'],
   },
   {
     id: 'drinks',
     label: 'Drinks',
-    title: 'Drinks',
-    copy: 'Air balang, juices, tea and coffee — easy to spot when you just need something cold.',
-    items: ['Air balang', 'Juice', 'Iced tea', 'Coffee'],
+    title: 'Keep it cold',
+    text: 'Air balang, juices, iced tea and coffee are grouped as their own easy-to-find stop.',
+    chips: ['Air balang', 'Juice', 'Iced tea', 'Coffee'],
   },
   {
     id: 'trucks',
     label: 'Food trucks',
-    title: 'Food trucks',
-    copy: 'A dedicated lane for quick, modern street-food formats and easy group orders.',
-    items: ['Burgers', 'Loaded fries', 'Wraps', 'Street food'],
+    title: 'The truck lane',
+    text: 'A separate lane for modern street-food formats, quick group orders and late-night second rounds.',
+    chips: ['Burgers', 'Loaded fries', 'Wraps', 'Street food'],
   },
 ]
 
 const zones = [
-  { id: 'food', code: 'A', title: 'Hot food', note: 'Main cooked-food lane.' },
-  { id: 'trucks', code: 'B', title: 'Food trucks', note: 'Quick pick-up and modern street food.' },
-  { id: 'field', code: 'C', title: 'Picnic field', note: 'Sit, gather and break fast together.' },
-  { id: 'prayer', code: 'D', title: 'Prayer area', note: 'A practical stop built into the visit flow.' },
+  { id: 'food', code: 'A', title: 'Food stalls', detail: 'Main cooked-food lane around the stadium perimeter.' },
+  { id: 'trucks', code: 'B', title: 'Food trucks', detail: 'Quick pick-up and modern street food.' },
+  { id: 'field', code: 'C', title: 'Iftar field', detail: 'Open picnic-style space for communal buka puasa.' },
+  { id: 'prayer', code: 'D', title: 'Prayer', detail: 'Solat facilities and nearby prayer access for the evening flow.' },
+]
+
+const flow = [
+  { time: '4:00 PM', title: 'Arrive early', copy: 'Walk the stalls while queues are lighter and decide what you want for iftar.' },
+  { time: 'Before Maghrib', title: 'Find your spot', copy: 'Move onto the field or into the stands and settle in with family or friends.' },
+  { time: 'Maghrib', title: 'Break fast together', copy: 'The field becomes the heart of Bazram as the crowd pauses for communal iftar.' },
+  { time: 'After iftar', title: 'Pray + continue', copy: 'Use the prayer facilities, then return for a second food round or the evening programme.' },
+  { time: 'Until 11 PM', title: 'Stay for the night', copy: 'Food, family activities and the city-night atmosphere continue around the stadium.' },
+]
+
+const programme = [
+  {
+    kicker: 'Ramadan programme',
+    title: 'Khatam Al-Quran',
+    copy: 'The Majlis Khatam Al-Quran on 12 March became one of the 2026 edition’s key community moments.',
+  },
+  {
+    kicker: 'Everyday experience',
+    title: 'Communal iftar',
+    copy: 'Visitors could buy food around the perimeter and break fast picnic-style on the historic stadium field.',
+  },
+  {
+    kicker: 'For families',
+    title: 'Activities + nightly programming',
+    copy: 'Bazram combined food with family-friendly activities and evening programmes throughout the Ramadan run.',
+  },
 ]
 
 const faqs = [
   {
-    q: 'When was the 2026 edition?',
-    a: '21 February — 18 March 2026, from 4 PM until 11 PM at Stadium Merdeka, Kuala Lumpur.',
+    q: 'What exactly was Bazram Merdeka 2026?',
+    a: 'A free-entry Ramadan bazaar and communal iftar experience at Stadium Merdeka, with more than 100 stalls, food trucks, picnic-style buka puasa areas, prayer access and Ramadan programming.',
   },
   {
-    q: 'Is Bazram only about food?',
-    a: 'Food is the main draw, but the experience also centres on communal iftar, gathering on the field, prayer facilities and Ramadan programming.',
+    q: 'When and where did it run?',
+    a: '21 February to 18 March 2026, daily from 4 PM to 11 PM at Stadium Merdeka, Kuala Lumpur.',
   },
   {
-    q: 'Can families come?',
-    a: 'Yes. Families can arrive, browse food, settle on the field, break fast and continue exploring after Maghrib.',
+    q: 'What is the easiest public transport?',
+    a: 'Maharajalela Monorail connects directly to the Stadium Merdeka area. Merdeka MRT is also adjacent, with Plaza Rakyat LRT and Hang Tuah within walking distance.',
   },
   {
-    q: 'Where can I see the latest Bazram content?',
-    a: 'The official Instagram feed is linked throughout this site and again in the footer.',
+    q: 'What house rules should visitors know?',
+    a: 'No smoking or vaping, no pets, no littering and no flammable materials. Children must be supervised. Running-track rules also prohibit heels, spike shoes and loitering on the track.',
   },
 ]
 
-function InstagramEmbed({ item }) {
+function Photo({ photo, className = '', label }) {
+  const [failed, setFailed] = useState(false)
   return (
-    <article className="ig-card">
-      <div className="ig-meta">
-        <span>{item.label}</span>
-        <span>@bazrammerdeka</span>
-      </div>
-      <iframe
-        title={item.title}
-        src={`https://www.instagram.com/${item.kind}/${item.id}/embed/`}
-        loading="lazy"
-        allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-        frameBorder="0"
-      />
-    </article>
+    <a className={`photo ${className}`} href={photo.href} target="_blank" rel="noreferrer">
+      {!failed ? (
+        <img src={photo.src} alt={photo.alt} loading="lazy" onError={() => setFailed(true)} />
+      ) : (
+        <div className="photo-fallback">
+          <span>Photo from @bazrammerdeka</span>
+          <b>Open original on Instagram ↗</b>
+        </div>
+      )}
+      {label && <span className="photo-label">{label}</span>}
+    </a>
   )
 }
 
 function App() {
   const root = useRef(null)
-  const foodPanel = useRef(null)
-  const zonePanel = useRef(null)
-  const faqBodies = useRef([])
   const [activeFood, setActiveFood] = useState('hot')
   const [activeZone, setActiveZone] = useState('field')
   const [openFaq, setOpenFaq] = useState(0)
 
-  const currentFood = useMemo(() => foodGroups.find((group) => group.id === activeFood), [activeFood])
-  const currentZone = useMemo(() => zones.find((zone) => zone.id === activeZone), [activeZone])
+  const food = useMemo(() => foodTabs.find((item) => item.id === activeFood) ?? foodTabs[0], [activeFood])
+  const zone = useMemo(() => zones.find((item) => item.id === activeZone) ?? zones[0], [activeZone])
 
   useEffect(() => {
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const lenis = new Lenis({ duration: reduced ? 0 : 1, smoothWheel: !reduced })
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const lenis = new Lenis({ duration: reduce ? 0 : 1.05, smoothWheel: !reduce })
     lenis.on('scroll', ScrollTrigger.update)
 
-    let frame = 0
-    const raf = (time) => {
+    let raf = 0
+    const loop = (time) => {
       lenis.raf(time)
-      frame = requestAnimationFrame(raf)
+      raf = requestAnimationFrame(loop)
     }
-    frame = requestAnimationFrame(raf)
+    raf = requestAnimationFrame(loop)
 
     const ctx = gsap.context(() => {
-      if (reduced) return
+      if (reduce) return
 
-      gsap
-        .timeline({ defaults: { ease: 'power3.out' } })
-        .from('.topbar', { y: -28, opacity: 0, duration: 0.65 })
-        .from('.hero-copy > *', { y: 24, opacity: 0, stagger: 0.07, duration: 0.62 }, '-=0.15')
-        .from('.hero-poster', { x: 38, opacity: 0, rotate: 2.5, duration: 0.85 }, '-=0.55')
-        .from('.fact', { y: 18, opacity: 0, stagger: 0.05, duration: 0.48 }, '-=0.35')
+      gsap.timeline({ defaults: { ease: 'power3.out' } })
+        .from('.site-nav', { y: -22, opacity: 0, duration: .65 })
+        .from('.hero-logo', { y: 26, opacity: 0, scale: .96, duration: .85 }, '-=.25')
+        .from('.hero-copy > *', { y: 18, opacity: 0, stagger: .07, duration: .55 }, '-=.4')
+        .from('.hero-photo', { x: 36, opacity: 0, scale: .97, duration: .8 }, '-=.55')
 
-      gsap.to('.hero-poster', {
-        yPercent: 7,
-        rotate: -1.5,
+      gsap.to('.hero-photo img', {
+        yPercent: 8,
         ease: 'none',
         scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: 1 },
       })
 
-      gsap.to('.sky-disc.one', {
-        x: -34,
-        y: 26,
-        ease: 'none',
-        scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: 1.2 },
-      })
-
-      gsap.to('.sky-disc.two', {
-        x: 28,
-        y: -18,
-        ease: 'none',
-        scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: 1.4 },
-      })
-
-      gsap.utils.toArray('[data-reveal]').forEach((section) => {
-        gsap.from(section.querySelectorAll('[data-item]'), {
-          y: 28,
+      gsap.utils.toArray('[data-reveal]').forEach((el) => {
+        gsap.from(el, {
+          y: 34,
           opacity: 0,
-          duration: 0.7,
-          stagger: 0.06,
+          duration: .72,
           ease: 'power3.out',
-          scrollTrigger: { trigger: section, start: 'top 78%' },
+          scrollTrigger: { trigger: el, start: 'top 84%' },
         })
+      })
+
+      gsap.utils.toArray('.story-photo').forEach((el, index) => {
+        gsap.from(el, {
+          clipPath: index % 2 ? 'inset(0 0 100% 0)' : 'inset(100% 0 0 0)',
+          duration: 1,
+          ease: 'power3.inOut',
+          scrollTrigger: { trigger: el, start: 'top 80%' },
+        })
+      })
+
+      gsap.from('.map-pin', {
+        scale: .6,
+        opacity: 0,
+        stagger: .06,
+        ease: 'back.out(1.8)',
+        scrollTrigger: { trigger: '.event-map', start: 'top 78%' },
       })
     }, root)
 
     return () => {
-      cancelAnimationFrame(frame)
+      cancelAnimationFrame(raf)
       ctx.revert()
       lenis.destroy()
     }
   }, [])
 
-  useEffect(() => {
-    if (!foodPanel.current) return
-    gsap.fromTo(
-      foodPanel.current.children,
-      { y: 10, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.34, stagger: 0.04, ease: 'power2.out' },
-    )
-  }, [activeFood])
-
-  useEffect(() => {
-    if (!zonePanel.current) return
-    gsap.fromTo(zonePanel.current, { y: 10, opacity: 0.55 }, { y: 0, opacity: 1, duration: 0.3, ease: 'power2.out' })
-  }, [activeZone])
-
-  useEffect(() => {
-    faqBodies.current.forEach((body, index) => {
-      if (!body) return
-      gsap.to(body, {
-        height: index === openFaq ? 'auto' : 0,
-        opacity: index === openFaq ? 1 : 0,
-        duration: 0.3,
-        ease: 'power2.out',
-      })
-    })
-  }, [openFaq])
-
   return (
     <main ref={root}>
-      <header className="topbar">
-        <a className="mini-brand" href="#top" aria-label="Bazram Merdeka home">
-          <span>BAZRAM</span>
-          <small>MERDEKA</small>
-        </a>
-        <nav className="nav-links" aria-label="Main navigation">
-          <a href="#explore">Explore</a>
-          <a href="#makan">Makan</a>
-          <a href="#highlights">Highlights</a>
+      <nav className="site-nav">
+        <a className="nav-brand" href="#top"><img src={LOGO} alt="Bazram Merdeka" /></a>
+        <div className="nav-links">
+          <a href="#experience">Experience</a>
+          <a href="#food">Food</a>
+          <a href="#programme">Programme</a>
           <a href="#visit">Visit</a>
-        </nav>
-        <a className="pill-button" href="#visit">Plan your visit</a>
+        </div>
+        <a className="nav-button" href="#visit">Visitor guide</a>
+      </nav>
+
+      <header className="hero" id="top">
+        <div className="hero-cloud cloud-one" />
+        <div className="hero-cloud cloud-two" />
+        <div className="wrap hero-grid">
+          <div className="hero-copy">
+            <span className="eyebrow">Ramadan at Stadium Merdeka · 2026 edition</span>
+            <img className="hero-logo" src={LOGO} alt="Bazram Merdeka" />
+            <p className="hero-intro">Food around the stadium. Iftar on the field. A Ramadan night framed by one of Kuala Lumpur’s most historic places.</p>
+            <div className="fact-row">
+              <span><b>21 Feb — 18 Mar</b><small>2026 edition</small></span>
+              <span><b>4 PM — 11 PM</b><small>daily</small></span>
+              <span><b>Free entry</b><small>Stadium Merdeka</small></span>
+              <span><b>118+ vendors</b><small>food + trucks</small></span>
+            </div>
+            <div className="hero-actions">
+              <a className="primary-btn" href="#experience">See the experience</a>
+              <a className="ghost-btn" href="#visit">Plan a visit</a>
+            </div>
+          </div>
+          <Photo photo={photos.iftar} className="hero-photo" label="Iftar at Stadium Merdeka · @bazrammerdeka" />
+        </div>
       </header>
 
-      <section className="hero" id="top">
-        <div className="sky-disc one" aria-hidden="true" />
-        <div className="sky-disc two" aria-hidden="true" />
-        <div className="hero-grid wrap">
-          <div className="hero-copy">
-            <span className="edition-chip">2026 edition</span>
-            <p className="eyebrow">Stadium Merdeka · Kuala Lumpur</p>
-            <h1>Ramadan, made for gathering.</h1>
-            <p className="hero-lede">
-              Food, communal iftar and the energy of Stadium Merdeka — in one easy evening plan.
-            </p>
-            <div className="hero-actions">
-              <a className="primary-button" href="#makan">What to eat</a>
-              <a className="text-button" href="#highlights">See the atmosphere ↗</a>
-            </div>
-          </div>
-
-          <figure className="hero-poster">
-            <img src={LOGO} alt="Bazram Merdeka logo against a blue sky" />
-          </figure>
+      <section className="intro wrap" id="experience">
+        <div className="section-copy" data-reveal>
+          <span className="eyebrow">What is Bazram?</span>
+          <h1>A bazaar built around the moment of buka puasa.</h1>
+          <p>Bazram Merdeka brought a Ramadan bazaar into the Stadium Merdeka precinct for the first time: more than a food stop, it turned the historic field into a place to eat, pray, gather and spend the evening together.</p>
         </div>
-
-        <div className="facts wrap" aria-label="Event facts">
-          <div className="fact"><span>Date</span><strong>21 Feb — 18 Mar</strong></div>
-          <div className="fact"><span>Time</span><strong>4 PM — 11 PM</strong></div>
-          <div className="fact"><span>Place</span><strong>Stadium Merdeka</strong></div>
-          <div className="fact"><span>Food</span><strong>118+ vendors</strong></div>
+        <div className="experience-cards">
+          <article data-reveal><span>01</span><h3>Choose your food</h3><p>Walk the perimeter for local favourites, desserts, drinks and food trucks.</p></article>
+          <article data-reveal><span>02</span><h3>Gather on the field</h3><p>Take your food inside and settle into the stadium for picnic-style iftar.</p></article>
+          <article data-reveal><span>03</span><h3>Stay after Maghrib</h3><p>Prayer access, family activities and evening programming keep the night moving.</p></article>
         </div>
       </section>
 
-      <section className="section wrap" id="explore" data-reveal>
-        <div className="section-heading" data-item>
-          <span className="section-kicker">Explore Bazram</span>
-          <h2>One night. Four things to know.</h2>
-        </div>
-        <div className="explore-grid">
-          <a className="explore-card yellow" href="#makan" data-item>
-            <span>01</span><h3>Makan</h3><p>Start with hot food, sweets, drinks or food trucks.</p><b>Explore food →</b>
-          </a>
-          <a className="explore-card blue" href="#layout" data-item>
-            <span>02</span><h3>Gather</h3><p>The field is the centre of the night: sit down, buka together, stay awhile.</p><b>See the layout →</b>
-          </a>
-          <a className="explore-card cream" href="#highlights" data-item>
-            <span>03</span><h3>Feel it</h3><p>See the food, the field and the crowd through Bazram's own feed.</p><b>Watch highlights →</b>
-          </a>
-          <a className="explore-card red" href="#visit" data-item>
-            <span>04</span><h3>Visit</h3><p>Know the dates, time, place and essentials before you head out.</p><b>Plan your visit →</b>
-          </a>
-        </div>
-      </section>
-
-      <section className="section food-section" id="makan" data-reveal>
+      <section className="night-flow">
         <div className="wrap">
-          <div className="section-heading" data-item>
-            <span className="section-kicker">Makan</span>
-            <h2>What are you craving?</h2>
+          <div className="section-heading" data-reveal>
+            <span className="eyebrow">How the night works</span>
+            <h2>Come for food. Stay for the field.</h2>
           </div>
-
-          <div className="food-shell" data-item>
-            <div className="food-tabs" role="tablist" aria-label="Food categories">
-              {foodGroups.map((group) => (
-                <button
-                  key={group.id}
-                  type="button"
-                  className={activeFood === group.id ? 'active' : ''}
-                  onClick={() => setActiveFood(group.id)}
-                >
-                  {group.label}
-                </button>
-              ))}
-            </div>
-
-            <div className="food-content" ref={foodPanel}>
-              <div>
-                <p className="eyebrow">Food guide</p>
-                <h3>{currentFood.title}</h3>
-                <p>{currentFood.copy}</p>
-              </div>
-              <div className="food-tags">
-                {currentFood.items.map((item) => <span key={item}>{item}</span>)}
-              </div>
-            </div>
+          <div className="flow-rail">
+            {flow.map((item, index) => (
+              <article className="flow-card" key={item.title} data-reveal>
+                <span className="flow-index">0{index + 1}</span>
+                <small>{item.time}</small>
+                <h3>{item.title}</h3>
+                <p>{item.copy}</p>
+              </article>
+            ))}
           </div>
         </div>
       </section>
 
-      <section className="section wrap" id="layout" data-reveal>
-        <div className="section-heading" data-item>
-          <span className="section-kicker">Stadium guide</span>
-          <h2>Know where you are going.</h2>
+      <section className="food-section wrap" id="food">
+        <div className="section-heading" data-reveal>
+          <span className="eyebrow">Makan</span>
+          <h2>Start with what you feel like eating.</h2>
+          <p>Instead of making visitors hunt through hundreds of stall cards, the guide starts with four clear food lanes.</p>
         </div>
-
-        <div className="layout-grid">
-          <div className="stadium-map" data-item>
-            <div className="track-ring">
-              <span className="field-title">PICNIC FIELD</span>
-              {zones.map((zone, index) => (
-                <button
-                  type="button"
-                  key={zone.id}
-                  className={`zone-pin pin-${index + 1} ${activeZone === zone.id ? 'active' : ''}`}
-                  onClick={() => setActiveZone(zone.id)}
-                  aria-label={zone.title}
-                >
-                  {zone.code}
-                </button>
-              ))}
-            </div>
+        <div className="food-ui" data-reveal>
+          <div className="food-tabs">
+            {foodTabs.map((item) => (
+              <button key={item.id} className={item.id === activeFood ? 'active' : ''} onClick={() => setActiveFood(item.id)}>{item.label}</button>
+            ))}
           </div>
-
-          <aside className="zone-detail" data-item ref={zonePanel}>
-            <span className="zone-code">{currentZone.code}</span>
-            <p className="eyebrow">Stadium zone</p>
-            <h3>{currentZone.title}</h3>
-            <p>{currentZone.note}</p>
-            <div className="zone-legend">
-              {zones.map((zone) => <button key={zone.id} onClick={() => setActiveZone(zone.id)}>{zone.code} · {zone.title}</button>)}
-            </div>
-          </aside>
-        </div>
-      </section>
-
-      <section className="section highlight-section" id="highlights" data-reveal>
-        <div className="wrap">
-          <div className="section-heading inverse" data-item>
-            <span className="section-kicker">From the feed</span>
-            <h2>See Bazram as it happened.</h2>
-          </div>
-          <div className="ig-grid">
-            {highlights.map((item) => <InstagramEmbed key={item.id} item={item} />)}
+          <div className="food-panel">
+            <div><span className="eyebrow">Browse by craving</span><h3>{food.title}</h3><p>{food.text}</p></div>
+            <div className="food-chips">{food.chips.map((chip) => <span key={chip}>{chip}</span>)}</div>
           </div>
         </div>
       </section>
 
-      <section className="section wrap" id="visit" data-reveal>
-        <div className="visit-grid">
-          <div className="visit-copy" data-item>
-            <span className="section-kicker">Visit</span>
-            <h2>Before you come.</h2>
-            <p>Stadium Merdeka, Kuala Lumpur. The 2026 edition ran from 21 February to 18 March, 4 PM to 11 PM.</p>
-            <div className="visit-actions">
-              <a className="primary-button" href="https://www.instagram.com/bazrammerdeka/" target="_blank" rel="noreferrer">Instagram ↗</a>
-              <a className="text-button" href="#faq">Quick answers ↓</a>
-            </div>
-          </div>
-          <div className="visit-card yellow-card" data-item><span>Come early</span><strong>For easier browsing</strong><p>Arrive before the main iftar rush if you want time to walk the food lanes comfortably.</p></div>
-          <div className="visit-card blue-card" data-item><span>Stay for buka</span><strong>For the full atmosphere</strong><p>The field, the crowd and the stadium setting are what make Bazram feel different from a normal bazaar.</p></div>
+      <section className="story-grid wrap" aria-label="Bazram photo story">
+        <Photo photo={photos.night} className="story-photo story-large" label="After dark · @bazrammerdeka" />
+        <div className="story-copy" data-reveal>
+          <span className="eyebrow">The setting</span>
+          <h2>Old stadium. New city skyline.</h2>
+          <p>Stadium Merdeka is where Malaya’s independence was proclaimed in 1957. Bazram re-used that national landmark as a living community space, with Merdeka 118 rising behind the field.</p>
+          <p>The contrast is part of the experience: heritage terraces, families on the grass, food smoke around the perimeter and the new Kuala Lumpur skyline overhead.</p>
         </div>
       </section>
 
-      <section className="section faq-section wrap" id="faq" data-reveal>
-        <div className="section-heading" data-item>
-          <span className="section-kicker">FAQ</span>
-          <h2>Quick answers.</h2>
+      <section className="layout-section" id="layout">
+        <div className="wrap layout-grid">
+          <div className="section-heading" data-reveal>
+            <span className="eyebrow">Find your way</span>
+            <h2>Four things you need to locate.</h2>
+            <p>Keep the map useful. Tap a marker to understand the role of each zone.</p>
+          </div>
+          <div className="event-map" data-reveal>
+            <div className="stadium-ring"><div className="stadium-field">IFTAR FIELD</div></div>
+            <button className={`map-pin pin-a ${activeZone === 'food' ? 'active' : ''}`} onClick={() => setActiveZone('food')}>A</button>
+            <button className={`map-pin pin-b ${activeZone === 'trucks' ? 'active' : ''}`} onClick={() => setActiveZone('trucks')}>B</button>
+            <button className={`map-pin pin-c ${activeZone === 'field' ? 'active' : ''}`} onClick={() => setActiveZone('field')}>C</button>
+            <button className={`map-pin pin-d ${activeZone === 'prayer' ? 'active' : ''}`} onClick={() => setActiveZone('prayer')}>D</button>
+            <div className="zone-readout"><span>{zone.code}</span><div><b>{zone.title}</b><p>{zone.detail}</p></div></div>
+          </div>
         </div>
-        <div className="faq-list">
-          {faqs.map((item, index) => (
-            <article className="faq-item" key={item.q} data-item>
-              <button type="button" onClick={() => setOpenFaq(openFaq === index ? -1 : index)}>
-                <span>{item.q}</span>
-                <span>{openFaq === index ? '−' : '+'}</span>
-              </button>
-              <div className="faq-answer" ref={(el) => { faqBodies.current[index] = el }}>
-                <p>{item.a}</p>
-              </div>
-            </article>
+      </section>
+
+      <section className="programme wrap" id="programme">
+        <div className="section-heading" data-reveal>
+          <span className="eyebrow">Programme</span>
+          <h2>The project is more than a row of food stalls.</h2>
+          <p>The strongest story is the combination of Ramadan programming, communal iftar and a heritage venue brought back into everyday public life.</p>
+        </div>
+        <div className="programme-grid">
+          {programme.map((item) => (
+            <article key={item.title} data-reveal><small>{item.kicker}</small><h3>{item.title}</h3><p>{item.copy}</p></article>
           ))}
         </div>
       </section>
 
-      <footer className="footer">
+      <section className="photo-band wrap">
+        <div className="photo-band-copy" data-reveal>
+          <span className="eyebrow">From Bazram’s Instagram</span>
+          <h2>Real event imagery, treated like editorial photography.</h2>
+          <p>No stock festival photos. Each image links back to the original Bazram post.</p>
+        </div>
+        <div className="photo-pair">
+          <Photo photo={photos.iftar} className="story-photo" label="Iftar · @bazrammerdeka" />
+          <Photo photo={photos.visit} className="story-photo offset" label="Visitor post · @bazrammerdeka" />
+        </div>
+      </section>
+
+      <section className="visit-section" id="visit">
+        <div className="wrap">
+          <div className="section-heading" data-reveal>
+            <span className="eyebrow">Visitor guide · 2026 archive</span>
+            <h2>Everything practical in one place.</h2>
+          </div>
+          <div className="visit-grid">
+            <article className="visit-card yellow" data-reveal><span>WHEN</span><h3>21 Feb — 18 Mar 2026</h3><p>Open daily from 4 PM to 11 PM. Entry was free.</p></article>
+            <article className="visit-card blue" data-reveal><span>WHERE</span><h3>Stadium Merdeka</h3><p>Jalan Stadium, Presint Merdeka 118, Kuala Lumpur.</p></article>
+            <article className="visit-card cream" data-reveal><span>BY RAIL</span><h3>Maharajalela / Merdeka</h3><p>Maharajalela Monorail connects directly to the stadium area. Merdeka MRT is also adjacent.</p></article>
+            <article className="visit-card red" data-reveal><span>GOOD TO KNOW</span><h3>Family-friendly</h3><p>Food stalls, picnic-style iftar, prayer access and nightly activities in one precinct.</p></article>
+          </div>
+
+          <div className="rules" data-reveal>
+            <div><span className="eyebrow">House rules</span><h3>Respect the stadium.</h3></div>
+            <ul>
+              <li>No smoking or vaping</li>
+              <li>No pets</li>
+              <li>No littering</li>
+              <li>Children must be supervised</li>
+              <li>No heels or spike shoes on the running track</li>
+              <li>No flammable materials or liquids</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section className="faq wrap">
+        <div className="section-heading" data-reveal><span className="eyebrow">FAQ</span><h2>Before heading over.</h2></div>
+        <div className="faq-list">
+          {faqs.map((item, index) => {
+            const open = openFaq === index
+            return (
+              <article className={`faq-item ${open ? 'open' : ''}`} key={item.q} data-reveal>
+                <button onClick={() => setOpenFaq(open ? -1 : index)}><span>{item.q}</span><b>{open ? '−' : '+'}</b></button>
+                <div className="faq-answer"><p>{item.a}</p></div>
+              </article>
+            )
+          })}
+        </div>
+      </section>
+
+      <footer>
         <div className="wrap footer-grid">
-          <div>
-            <div className="footer-brand"><span>BAZRAM</span><small>MERDEKA</small></div>
-            <p>Ramadan at Stadium Merdeka.</p>
-          </div>
-          <div className="footer-meta">
-            <a href="https://www.instagram.com/bazrammerdeka/" target="_blank" rel="noreferrer">Instagram ↗</a>
-            <span>Stadium Merdeka · Kuala Lumpur</span>
-            <span>An event by 2Cool Productions.</span>
-          </div>
+          <div><img src={LOGO} alt="Bazram Merdeka" /><p>Ramadan at Stadium Merdeka.</p></div>
+          <div className="footer-links"><a href="https://www.instagram.com/bazrammerdeka/" target="_blank" rel="noreferrer">Instagram ↗</a><span>2026 event archive</span><span>An event by 2Cool Productions.</span></div>
         </div>
       </footer>
     </main>
