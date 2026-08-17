@@ -125,10 +125,6 @@ function Home() {
       </div>
     </header>
 
-    <section className="quick-preview"><div className="wrap quick-grid">
-      {[['Experience','A Ramadan evening, from arrival to after dark.','#experience'],['Food zones','Start with what you feel like eating.','/food'],['Programme','See the main rhythm of the night.','/programme']].map(([t,c,h],i)=><a href={h} className="quick-card" key={t} data-reveal><span>0{i+1}</span><h3>{t}</h3><p>{c}</p><b>→</b></a>)}
-    </div></section>
-
     <section id="identity" className="photo-bg identity" style={{backgroundImage:`linear-gradient(rgba(15,18,21,.62),rgba(15,18,21,.62)),url(${IMAGES.crowd})`}}>
       <div className="wrap identity-inner" data-reveal><span className="eyebrow light">Bazram Merdeka</span><h2>A Ramadan bazaar inside one of Malaysia’s most historic stadiums.</h2><div className="identity-facts"><div><b>118+</b><span>vendors</span><p>Food, drinks and food trucks.</p></div><div><b>Iftar</b><span>on the field</span><p>Break fast together inside the stadium.</p></div><div><b>1957</b><span>heritage venue</span><p>Stadium Merdeka, in the heart of Kuala Lumpur.</p></div></div></div>
     </section>
