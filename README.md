@@ -1,19 +1,27 @@
-# Bazram Merdeka Interactive Experience — V2
+# Bazram Merdeka
 
-A GSAP-driven editorial event concept inspired by the visual energy of Bazram Merdeka at Stadium Merdeka.
+A compact, motion-led event experience for Bazram Merdeka at Stadium Merdeka, Kuala Lumpur.
 
-## V2 changes
-- Added a dedicated live Instagram highlight section using official Instagram embeds.
-- Featured public Bazram posts/reels around the night atmosphere, food, communal iftar, and visitor tips.
-- Replaced the connected script typeface with Instrument Serif italic.
-- Replaced Anton with Bebas Neue for cleaner, airier display typography.
-- Refined borders, shadows, pills, cards and media frames into a cleaner editorial system.
-- Added GSAP reveal choreography for the social highlights and a moving event ticker.
+## Direction
+
+The site behaves like an event guide rather than a long GSAP demo reel: cinematic arrival, compact exploration, a stadium zone interface, food discovery, one controlled dusk-to-night sequence, programme archive, real Instagram content, visit information and FAQ. Red is used only as an accent and the 2Cool Productions acknowledgement stays minimal in the footer.
+
+## Stack
+
+- React 18 + Vite
+- GSAP + ScrollTrigger
+- Lenis smooth scrolling
+- Native CSS
 
 ## Run
+
 ```bash
 npm install
 npm run dev
 ```
 
-Instagram embeds require an internet connection and remain hosted by Instagram; this project does not redistribute the original media files.
+Production build:
+
+```bash
+npm run build
+```
