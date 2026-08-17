@@ -63,7 +63,7 @@ const faqs = [
   },
   {
     q: 'Can families come?',
-    a: 'Yes. The site is designed around a family-friendly evening flow: arrive, browse food, settle on the field, break fast and continue exploring after Maghrib.',
+    a: 'Yes. Families can arrive, browse food, settle on the field, break fast and continue exploring after Maghrib.',
   },
   {
     q: 'Where can I see the latest Bazram content?',
@@ -242,16 +242,16 @@ function App() {
         </div>
         <div className="explore-grid">
           <a className="explore-card yellow" href="#makan" data-item>
-            <span>01</span><h3>Makan</h3><p>Find food by category, not by scrolling through hundreds of cards.</p><b>Explore food →</b>
+            <span>01</span><h3>Makan</h3><p>Start with hot food, sweets, drinks or food trucks.</p><b>Explore food →</b>
           </a>
           <a className="explore-card blue" href="#layout" data-item>
             <span>02</span><h3>Gather</h3><p>The field is the centre of the night: sit down, buka together, stay awhile.</p><b>See the layout →</b>
           </a>
           <a className="explore-card cream" href="#highlights" data-item>
-            <span>03</span><h3>Feel it</h3><p>Use real Bazram footage instead of stock festival imagery.</p><b>Watch highlights →</b>
+            <span>03</span><h3>Feel it</h3><p>See the food, the field and the crowd through Bazram's own feed.</p><b>Watch highlights →</b>
           </a>
           <a className="explore-card red" href="#visit" data-item>
-            <span>04</span><h3>Visit</h3><p>Dates, time, place and practical answers in one compact section.</p><b>Plan your visit →</b>
+            <span>04</span><h3>Visit</h3><p>Know the dates, time, place and essentials before you head out.</p><b>Plan your visit →</b>
           </a>
         </div>
       </section>
@@ -331,7 +331,7 @@ function App() {
         <div className="wrap">
           <div className="section-heading inverse" data-item>
             <span className="section-kicker">From the feed</span>
-            <h2>Real moments, not filler.</h2>
+            <h2>See Bazram as it happened.</h2>
           </div>
           <div className="ig-grid">
             {highlights.map((item) => <InstagramEmbed key={item.id} item={item} />)}
