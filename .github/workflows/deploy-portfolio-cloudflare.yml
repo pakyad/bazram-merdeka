@@ -1,0 +1,38 @@
+name: Deploy Portfolio to iyadiman.me
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/deploy-portfolio-cloudflare.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      NEXT_PUBLIC_SITE_URL: https://iyadiman.me
+
+    steps:
+      - name: Checkout latest portfolio
+        uses: actions/checkout@v4
+        with:
+          repository: pakyad/portfolio
+          ref: main
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Deploy latest portfolio to Cloudflare Workers
+        run: npx wrangler@latest deploy --yes --name iyad-portfolio --route "iyadiman.me/*"
