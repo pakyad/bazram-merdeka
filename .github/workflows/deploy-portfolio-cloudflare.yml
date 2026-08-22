@@ -36,3 +36,5 @@ jobs:
 
       - name: Deploy latest portfolio to Cloudflare Workers
         run: npx wrangler@latest deploy --yes --name iyad-portfolio --route "iyadiman.me/*"
+
+# Portfolio source trigger: 07257802bf2a29fd3f95235c5f28b45d5507bbf4
