@@ -1,0 +1,77 @@
+name: Deploy 2Cool to Cloudflare
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/deploy-2cool-cloudflare.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      PROJECT_NAME: 2coolproduction
+      CUSTOM_DOMAIN: 2cool.iyadiman.me
+
+    steps:
+      - name: Checkout 2Cool repository
+        uses: actions/checkout@v4
+        with:
+          repository: pakyad/2coolproduction
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Build
+        run: npm run build
+
+      - name: Ensure Cloudflare Pages project exists
+        shell: bash
+        run: |
+          set -euo pipefail
+          API="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects"
+          STATUS=$(curl -sS -o /tmp/project.json -w "%{http_code}" \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            "${API}/${PROJECT_NAME}")
+
+          if [ "${STATUS}" = "200" ]; then
+            echo "Pages project ${PROJECT_NAME} already exists."
+          else
+            curl -fsS \
+              -X POST \
+              -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+              -H "Content-Type: application/json" \
+              "${API}" \
+              --data "{\"name\":\"${PROJECT_NAME}\",\"production_branch\":\"main\"}"
+          fi
+
+      - name: Deploy 2Cool to Cloudflare Pages
+        run: npx wrangler@4 pages deploy dist --project-name "$PROJECT_NAME" --branch main --commit-dirty=true
+
+      - name: Ensure 2Cool custom domain
+        shell: bash
+        run: |
+          set -euo pipefail
+          API="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects/${PROJECT_NAME}/domains"
+          STATUS=$(curl -sS -o /tmp/domain.json -w "%{http_code}" \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            "${API}/${CUSTOM_DOMAIN}")
+
+          if [ "${STATUS}" = "200" ]; then
+            echo "${CUSTOM_DOMAIN} is already registered."
+          else
+            curl -fsS \
+              -X POST \
+              -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+              -H "Content-Type: application/json" \
+              "${API}" \
+              --data "{\"name\":\"${CUSTOM_DOMAIN}\"}"
+          fi
