@@ -18,8 +18,8 @@ const WHATSAPP = 'https://wa.me/60164597091?text=Hi%202Cool%20Productions%2C%20s
 
 const journey = [
   { title:'Arrive', time:'From 4 PM', headline:'Come before the rush.', copy:'Give yourself time to enter, look around and settle in before the busiest part of the evening.', image:IMAGES.stadium },
-  { title:'Cari makan', time:'Before Maghrib', headline:'Find your buka.', copy:'Browse the food lanes, drinks and food trucks, then choose what you want to bring onto the field.', image:IMAGES.food },
-  { title:'Iftar', time:'At Maghrib', headline:'Buka together.', copy:'Find a place on the field and share the moment with everyone gathered inside Stadium Merdeka.', image:IMAGES.hero },
+  { title:'Find your food', time:'Before Maghrib', headline:'Find your meal.', copy:'Browse the food lanes, drinks and food trucks, then choose what you want to bring onto the field.', image:IMAGES.food },
+  { title:'Iftar', time:'At Maghrib', headline:'Break fast together.', copy:'Find a place on the field and share the moment with everyone gathered inside Stadium Merdeka.', image:IMAGES.hero },
   { title:'After dark', time:'After iftar', headline:'Stay for the night.', copy:'Prayer, dessert, another food round and the night atmosphere continue around the stadium.', image:IMAGES.crowd },
 ]
 
@@ -32,7 +32,7 @@ const programme = [
 
 const foods = [
   ['Hot food','Grills, rice dishes and familiar Ramadan favourites.',IMAGES.food],
-  ['Sweet','Kuih, chilled desserts and something manis after Maghrib.',IMAGES.hero],
+  ['Sweet','Kuih, chilled desserts and something sweet after Maghrib.',IMAGES.hero],
   ['Drinks','Cold drinks, juice, tea and coffee for the evening.',IMAGES.crowd],
   ['Food trucks','Street-food formats and easy second-round options.',IMAGES.stadium],
 ]
@@ -43,14 +43,29 @@ function Img({src,alt,className=''}){
   return <img className={className} src={src} alt={alt} onError={()=>setBad(true)} loading="lazy"/>
 }
 
+let lenisInstance=null
+
 function useMotion(root, home=false){
   useEffect(()=>{
     const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const lenis=new Lenis({duration:reduced?0:1.0,smoothWheel:!reduced})
+    lenisInstance=lenis
     lenis.on('scroll',ScrollTrigger.update)
     let raf
     const loop=t=>{lenis.raf(t);raf=requestAnimationFrame(loop)}
     raf=requestAnimationFrame(loop)
+    const onAnchorClick=e=>{
+      const a=e.target.closest('a[href^="#"],a[href^="/#"]')
+      if(!a) return
+      const href=a.getAttribute('href')
+      const hash=href.startsWith('/#')?href.slice(1):href
+      if(href.startsWith('/#')&&window.location.pathname!=='/') return
+      const el=document.querySelector(hash)
+      if(!el) return
+      e.preventDefault()
+      lenis.scrollTo(el,{offset:-96})
+    }
+    document.addEventListener('click',onAnchorClick)
     const ctx=gsap.context(()=>{
       gsap.set('.progress',{scaleX:0,transformOrigin:'left center'})
       gsap.to('.progress',{scaleX:1,ease:'none',scrollTrigger:{start:0,end:'max',scrub:.2}})
@@ -58,29 +73,56 @@ function useMotion(root, home=false){
         ScrollTrigger.create({trigger:'.hero',start:'bottom 88px',onEnter:()=>document.body.classList.add('nav-light'),onLeaveBack:()=>document.body.classList.remove('nav-light')})
       }
       if(reduced) return
-      gsap.timeline({defaults:{ease:'power3.out'}})
-        .from('.nav-inner>*',{y:-12,opacity:0,stagger:.04,duration:.4})
-        .from('.hero h1 span',{yPercent:110,stagger:.08,duration:.72},'-=.08')
-        .from('.hero-lead,.hero-meta,.hero-actions',{y:15,opacity:0,stagger:.07,duration:.42},'-=.32')
-        .from('.hero-photo',{x:28,opacity:0,scale:.98,duration:.7},'-=.5')
+      if(home){
+        gsap.timeline({defaults:{ease:'power3.out'}})
+          .from('.nav-inner>*',{y:-12,opacity:0,stagger:.04,duration:.4})
+          .from('.hero h1 span',{yPercent:110,stagger:.08,duration:.72},'-=.08')
+          .from('.hero-lead,.hero-meta,.hero-actions',{y:15,opacity:0,stagger:.07,duration:.42},'-=.32')
+          .from('.hero-photo',{x:28,opacity:0,scale:.98,duration:.7},'-=.5')
+      } else {
+        gsap.timeline({defaults:{ease:'power3.out'}})
+          .from('.nav-inner>*',{y:-12,opacity:0,stagger:.04,duration:.4})
+          .from('.subhero h1, .subhero p, .subhero-photo',{y:18,opacity:0,stagger:.07,duration:.55},'-=.1')
+      }
       gsap.utils.toArray('[data-reveal]').forEach(el=>gsap.from(el,{y:24,opacity:0,duration:.65,ease:'power3.out',scrollTrigger:{trigger:el,start:'top 86%'}}))
       gsap.utils.toArray('.cinematic').forEach(el=>gsap.to(el,{backgroundPosition:'50% 58%',ease:'none',scrollTrigger:{trigger:el,start:'top bottom',end:'bottom top',scrub:1}}))
       if(home){
         gsap.to('.hero-photo img',{yPercent:4,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:.8}})
-        gsap.to('.sky-orb',{y:'48vh',x:'-10vw',scale:.7,backgroundColor:'#f0b24b',ease:'none',scrollTrigger:{trigger:'.home',start:'top top',end:'65% bottom',scrub:1.2}})
-        gsap.to('.night-wash',{opacity:.22,ease:'none',scrollTrigger:{trigger:'.home',start:'25% top',end:'70% bottom',scrub:1.2}})
+        gsap.to('.sky-orb',{y:'48vh',x:'-10vw',scale:.7,backgroundColor:'#f0b24b',ease:'none',scrollTrigger:{trigger:root.current,start:'top top',end:'65% bottom',scrub:1.2}})
+        gsap.to('.night-wash',{opacity:.22,ease:'none',scrollTrigger:{trigger:root.current,start:'25% top',end:'70% bottom',scrub:1.2}})
       }
     },root)
-    return()=>{cancelAnimationFrame(raf);ctx.revert();lenis.destroy();document.body.classList.remove('nav-light')}
+    return()=>{cancelAnimationFrame(raf);ctx.revert();lenis.destroy();document.removeEventListener('click',onAnchorClick);lenisInstance=null;document.body.classList.remove('nav-light')}
   },[root,home])
 }
 
+const NAV_LINKS=[['/#experience','Experience'],['/food','Food'],['/programme','Programme'],['/visit','Visit']]
+
 function Nav({home=false}){
-  return <nav className={`nav ${home?'nav-home':''}`}><div className="nav-inner">
-    <a className="brand" href="/"><img src={LOGO} alt="Bazram Merdeka"/></a>
-    <div className="nav-links"><a href="/#experience">Experience</a><a href="/food">Food</a><a href="/programme">Programme</a><a href="/visit">Visit</a></div>
-    <a className="nav-cta" href="/visit">Visitor guide ↗</a>
-  </div><span className="progress"/></nav>
+  const [open,setOpen]=useState(false)
+  useEffect(()=>{
+    document.body.style.overflow=open?'hidden':''
+    if(lenisInstance){open?lenisInstance.stop():lenisInstance.start()}
+    return()=>{document.body.style.overflow=''}
+  },[open])
+  return <nav className={`nav ${home?'nav-home':''}`}>
+    <div className="nav-inner">
+      <a className="brand" href="/"><img src={LOGO} alt="Bazram Merdeka"/></a>
+      <div className="nav-links">{NAV_LINKS.map(([href,label])=><a href={href} key={href}>{label}</a>)}</div>
+      <div className="nav-right">
+        <a className="nav-cta" href="/visit">Visitor guide ↗</a>
+        <button className="nav-burger" aria-label={open?'Close menu':'Open menu'} aria-expanded={open} onClick={()=>setOpen(v=>!v)}>
+          <svg className="icon-open" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true"><path d="M3 5.5h14M3 10h14M3 14.5h14"/></svg>
+          <svg className="icon-close" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15"/></svg>
+        </button>
+      </div>
+    </div>
+    <div className={`mobile-menu ${open?'open':''}`}>
+      {NAV_LINKS.map(([href,label])=><a href={href} key={href} onClick={()=>setOpen(false)}>{label}</a>)}
+      <a href="/vendors" onClick={()=>setOpen(false)}>Vendors ↗</a>
+    </div>
+    <span className="progress"/>
+  </nav>
 }
 
 function Footer(){return <footer className="footer"><div className="shell footer-main"><img src={LOGO} alt="Bazram Merdeka"/><div><b>Stadium Merdeka, Kuala Lumpur</b><span>21 Feb–18 Mar 2026 · 4 PM–11 PM · Free entry</span></div><div className="footer-nav"><a href="/food">Food</a><a href="/programme">Programme</a><a href="/visit">Visit</a><a href="https://www.instagram.com/bazrammerdeka/" target="_blank" rel="noreferrer">Instagram ↗</a></div></div><div className="shell footer-bottom"><span>An event by 2Cool Productions</span><a href="/vendors">Vendor enquiries →</a></div></footer>}
@@ -98,17 +140,17 @@ function Home(){
   return <main ref={root} className="home">
     <div className="sky-orb"/><div className="night-wash"/>
     <div className="hero-wrap"><Nav home/><header className="hero"><div className="shell hero-grid">
-      <div className="hero-copy"><h1><span>Where food, faith &amp;</span><span>heritage come together.</span></h1><p className="hero-lead">Come hungry, bring your people, and buka together inside Stadium Merdeka.</p><div className="hero-meta"><span>Stadium Merdeka</span><span>21 Feb–18 Mar</span><span>4 PM–11 PM</span><span>Free entry</span></div><div className="hero-actions"><a className="button primary" href="/visit">Plan your evening ↗</a><a className="button secondary" href="#iftar">See the atmosphere ↓</a></div></div>
+      <div className="hero-copy"><h1><span>Where food, faith &amp;</span><span>heritage come together.</span></h1><p className="hero-lead">Come hungry, bring your people, and break fast together inside Stadium Merdeka.</p><div className="hero-meta"><span>Stadium Merdeka</span><span>21 Feb–18 Mar</span><span>4 PM–11 PM</span><span>Free entry</span></div><div className="hero-actions"><a className="button primary" href="/visit">Plan your evening ↗</a><a className="button secondary" href="#iftar">See the atmosphere ↓</a></div></div>
       <figure className="hero-photo"><Img src={IMAGES.hero} alt="Iftar at Stadium Merdeka"/><figcaption>Iftar at Stadium Merdeka</figcaption></figure>
     </div></header></div>
 
-    <section className="welcome cinematic" style={{backgroundImage:`linear-gradient(90deg,rgba(14,18,21,.88),rgba(14,18,21,.45)),url(${IMAGES.crowd})`}}><div className="shell welcome-inner" data-reveal><div><h2>This is your Ramadan evening.</h2><p>Arrive before Maghrib. Cari makan. Find your place. Buka together. Stay a little longer.</p></div><div className="welcome-links"><a href="/food">Find something to eat ↗</a><a href="#experience">See how the evening unfolds ↓</a></div></div></section>
+    <section className="welcome cinematic" style={{backgroundImage:`linear-gradient(90deg,rgba(14,18,21,.88),rgba(14,18,21,.45)),url(${IMAGES.crowd})`}}><div className="shell welcome-inner" data-reveal><div><h2>This is your Ramadan evening.</h2><p>Arrive before Maghrib. Find your food. Claim your place. Break fast together. Stay a little longer.</p></div><div className="welcome-links"><a href="/food">Find something to eat ↗</a><a href="#experience">See how the evening unfolds ↓</a></div></div></section>
 
     <section id="experience" className="experience"><div className="shell" data-reveal><header className="section-title"><h2>Before Maghrib, take your time.</h2><p>Choose a moment below to see what the evening feels like.</p></header><div className="experience-tabs" role="tablist">{journey.map((item,i)=><button role="tab" aria-selected={i===active} className={i===active?'active':''} onClick={()=>select(i)} key={item.title}>{item.title}</button>)}</div><div className="experience-feature"><div className="experience-image"><Img src={journey[active].image} alt={journey[active].title}/></div><div className="experience-copy"><span>{journey[active].time}</span><h3>{journey[active].headline}</h3><p>{journey[active].copy}</p>{active===1&&<a href="/food">Explore food ↗</a>}{active===3&&<a href="/programme">See what’s on ↗</a>}</div></div></div></section>
 
     <section id="iftar" className="iftar cinematic" style={{backgroundImage:`url(${IMAGES.hero})`}}><div className="iftar-overlay"/><div className="shell iftar-text" data-reveal><span>At Maghrib</span><h2>The whole stadium pauses together.</h2><p>Visitors gather on the field, settle in with their food and wait for the same moment.</p></div></section>
 
-    <section className="after"><div className="shell after-layout" data-reveal><div className="after-photo"><Img src={IMAGES.crowd} alt="Bazram Merdeka after dark"/></div><div className="after-copy"><h2>Stay after buka.</h2><p>The evening carries on naturally. Pray, grab dessert, walk the bazaar again or see what is happening around the stadium.</p><div className="after-links"><a href="/visit#prayer">Prayer information ↗</a><a href="/food">Dessert & drinks ↗</a><a href="/programme">Evening programme ↗</a></div></div></div></section>
+    <section className="after"><div className="shell after-layout" data-reveal><div className="after-photo"><Img src={IMAGES.crowd} alt="Bazram Merdeka after dark"/></div><div className="after-copy"><h2>Stay after iftar.</h2><p>The evening carries on naturally. Pray, grab dessert, walk the bazaar again or see what is happening around the stadium.</p><div className="after-links"><a href="/visit#prayer">Prayer information ↗</a><a href="/food">Dessert & drinks ↗</a><a href="/programme">Evening programme ↗</a></div></div></div></section>
 
     <section className="programme-home"><div className="shell programme-layout"><div className="programme-heading" data-reveal><h2>What’s happening?</h2><p>The main rhythm of the evening, without turning the homepage into a timetable.</p><a href="/programme">View full programme ↗</a></div><div className="schedule" data-reveal>{programme.map(([time,title,copy])=><div className="schedule-row" key={time}><time>{time}</time><div><b>{title}</b><p>{copy}</p></div></div>)}</div></div></section>
 
@@ -125,7 +167,7 @@ function ProgrammePage(){return <PageShell title="What’s happening tonight?" i
 
 function VisitPage(){return <PageShell title="Plan your visit." intro="Everything practical for a smooth evening at Stadium Merdeka." image={IMAGES.stadium}><section className="page-section"><div className="shell visit-page"><dl className="visit-list"><div><dt>Date</dt><dd>21 Feb–18 Mar 2026</dd></div><div><dt>Hours</dt><dd>4 PM–11 PM</dd></div><div><dt>Location</dt><dd>Stadium Merdeka</dd></div><div><dt>Entry</dt><dd>Free</dd></div></dl><div className="visit-copy"><article><h2>Getting here</h2><p>Merdeka MRT and Maharajalela Monorail are the most useful rail approaches to the stadium precinct.</p></article><article id="prayer"><h2>Prayer</h2><p>Prayer access is part of the evening flow. Give yourself enough time before Maghrib.</p></article><article><h2>Families</h2><p>The field and stands work well for groups and families. Children should remain supervised.</p></article><article><h2>House rules</h2><p>No smoking or vaping, no pets, no littering and no flammable materials. Respect stadium restrictions.</p></article></div></div></section></PageShell>}
 
-function VendorsPage(){return <PageShell title="Book a tapak at Bazram Merdeka." intro="Seller information, separate from the visitor experience." image={IMAGES.food}><section className="page-section"><div className="shell vendor-layout"><div><h2>From RM1,000 for the 26-day run.</h2><p>Makanan, Minuman, Food Truck, Bahan Kering and selected Non-F&amp;B concepts were included in the seller call.</p></div><aside><b>21 Feb–18 Mar</b><span>4 PM–11 PM</span><a className="button primary" href={WHATSAPP} target="_blank" rel="noreferrer">Enquire on WhatsApp ↗</a></aside></div></section></PageShell>}
+function VendorsPage(){return <PageShell title="Book a stall at Bazram Merdeka." intro="Seller information, separate from the visitor experience." image={IMAGES.food}><section className="page-section"><div className="shell vendor-layout"><div><h2>From RM1,000 for the 26-day run.</h2><p>Food, drinks, food trucks, dry goods and selected non-F&amp;B concepts were included in the seller call.</p></div><aside><b>21 Feb–18 Mar</b><span>4 PM–11 PM</span><a className="button primary" href={WHATSAPP} target="_blank" rel="noreferrer">Enquire on WhatsApp ↗</a></aside></div></section></PageShell>}
 
 function NotFound(){return <main><Nav/><section className="notfound"><img src={LOGO} alt="Bazram Merdeka"/><h1>Page not found.</h1><a className="button primary" href="/">Back home</a></section></main>}
 
