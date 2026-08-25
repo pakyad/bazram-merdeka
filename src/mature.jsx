@@ -79,10 +79,12 @@ function useMotion(root, home=false){
           .from('.hero h1 span',{yPercent:110,stagger:.08,duration:.72},'-=.08')
           .from('.hero-lead,.hero-meta,.hero-actions',{y:15,opacity:0,stagger:.07,duration:.42},'-=.32')
           .from('.hero-photo',{x:28,opacity:0,scale:.98,duration:.7},'-=.5')
-      } else {
+      } else if(document.querySelector('.subhero')){
         gsap.timeline({defaults:{ease:'power3.out'}})
           .from('.nav-inner>*',{y:-12,opacity:0,stagger:.04,duration:.4})
           .from('.subhero h1, .subhero p, .subhero-photo',{y:18,opacity:0,stagger:.07,duration:.55},'-=.1')
+      } else {
+        gsap.from('.nav-inner>*',{y:-12,opacity:0,stagger:.04,duration:.4,ease:'power3.out'})
       }
       gsap.utils.toArray('[data-reveal]').forEach(el=>gsap.from(el,{y:24,opacity:0,duration:.65,ease:'power3.out',scrollTrigger:{trigger:el,start:'top 86%'}}))
       gsap.utils.toArray('.cinematic').forEach(el=>gsap.to(el,{backgroundPosition:'50% 58%',ease:'none',scrollTrigger:{trigger:el,start:'top bottom',end:'bottom top',scrub:1}}))
@@ -96,7 +98,7 @@ function useMotion(root, home=false){
   },[root,home])
 }
 
-const NAV_LINKS=[['/#experience','Experience'],['/food','Food'],['/programme','Programme'],['/visit','Visit']]
+const NAV_LINKS=[['/#experience','Experience'],['/iftar','Iftar Hour'],['/food','Food'],['/programme','Programme'],['/visit','Visit']]
 
 function Nav({home=false}){
   const [open,setOpen]=useState(false)
@@ -125,7 +127,155 @@ function Nav({home=false}){
   </nav>
 }
 
-function Footer(){return <footer className="footer"><div className="shell footer-main"><img src={LOGO} alt="Bazram Merdeka"/><div><b>Stadium Merdeka, Kuala Lumpur</b><span>21 Feb–18 Mar 2026 · 4 PM–11 PM · Free entry</span></div><div className="footer-nav"><a href="/food">Food</a><a href="/programme">Programme</a><a href="/visit">Visit</a><a href="https://www.instagram.com/bazrammerdeka/" target="_blank" rel="noreferrer">Instagram ↗</a></div></div><div className="shell footer-bottom"><span>An event by 2Cool Productions</span><a href="/vendors">Vendor enquiries →</a></div></footer>}
+function Footer(){return <footer className="footer"><div className="shell footer-main"><img src={LOGO} alt="Bazram Merdeka"/><div><b>Stadium Merdeka, Kuala Lumpur</b><span>21 Feb–18 Mar 2026 · 4 PM–11 PM · Free entry</span></div><div className="footer-nav"><a href="/iftar">The Iftar Hour</a><a href="/food">Food</a><a href="/programme">Programme</a><a href="/visit">Visit</a><a href="https://www.instagram.com/bazrammerdeka/" target="_blank" rel="noreferrer">Instagram ↗</a></div></div><div className="shell footer-bottom"><span>An event by 2Cool Productions</span><a href="/vendors">Vendor enquiries →</a></div></footer>}
+
+const STARS=Array.from({length:56},(_,i)=>({left:(i*61.8)%100,top:(i*37.3)%62,s:i%4===0?3:i%2===0?2:1.5,o:.35+((i*29)%50)/100}))
+
+function useMaghrib(){
+  const [s,setS]=useState(null)
+  useEffect(()=>{
+    let alive=true,iv=null
+    const ctrl=new AbortController()
+    const to=setTimeout(()=>ctrl.abort(),8000)
+    fetch('https://api.aladhan.com/v1/timingsByCity?city=Kuala%20Lumpur&country=Malaysia&method=17',{signal:ctrl.signal})
+      .then(r=>r.json())
+      .then(j=>{
+        if(!alive)return
+        clearTimeout(to)
+        const m=j&&j.data&&j.data.timings&&j.data.timings.Maghrib
+        if(!m||!/^\d{1,2}:\d{2}/.test(m))return
+        const parts=m.split(':')
+        const target=new Date()
+        target.setHours(+parts[0],+parts[1],0,0)
+        const pad=n=>String(n).padStart(2,'0')
+        const tick=()=>{
+          const d=target-Date.now()
+          if(d<=0){setS({label:parts.join(':'),sub:'Maghrib today · Kuala Lumpur'});clearInterval(iv);return}
+          setS({label:`${pad(Math.floor(d/36e5))}:${pad(Math.floor(d%36e5/6e4))}:${pad(Math.floor(d%6e4/1e3))}`,sub:'until Maghrib · Kuala Lumpur'})
+        }
+        tick()
+        iv=setInterval(tick,1000)
+      })
+      .catch(()=>{})
+    return()=>{alive=false;clearTimeout(to);if(iv)clearInterval(iv)}
+  },[])
+  return s
+}
+
+function useIftarMotion(root){
+  useEffect(()=>{
+    const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const stage=root.current.querySelector('.sky-stage')
+    const orb=root.current.querySelector('.sky-body')
+    const setX=gsap.quickSetter(orb,'x','px')
+    const setY=gsap.quickSetter(orb,'y','px')
+    const bez=(a,c1,c2,b,t)=>{const u=1-t;return u*u*u*a+3*u*u*t*c1+3*u*t*t*c2+t*t*t*b}
+    const orbPos=p=>{
+      if(p<.45){const t=p/.45;return[bez(5,18,52,72,t),bez(90,10,-6,80,t)]}
+      if(p<.6){const t=(p-.45)/.15;return[bez(72,74,82,78,t),bez(80,92,102,104,t)]}
+      const t=(p-.6)/.4;return[bez(78,62,30,46,t),bez(104,64,32,10,t)]
+    }
+    let st=null,ctx=null
+    const apply=p=>{const[x,y]=orbPos(p);setX(x/100*stage.clientWidth);setY(y/100*stage.clientHeight)}
+    apply(0)
+    const onResize=()=>apply(st?st.progress:0)
+    window.addEventListener('resize',onResize)
+    if(!reduced){
+      ctx=gsap.context(()=>{
+        const tl=gsap.timeline({defaults:{ease:'none'},scrollTrigger:{trigger:root.current,start:'top top',end:'bottom bottom',scrub:1,onUpdate:self=>apply(self.progress)}})
+        st=tl.scrollTrigger
+        tl.to('.s-sunset',{opacity:1,duration:1},0)
+          .to('.s-maghrib',{opacity:1,duration:1},1)
+          .to('.s-dusk',{opacity:1,duration:1},2)
+          .to('.s-night',{opacity:1,duration:1},3)
+          .to('.sky-line',{opacity:1,duration:2.4},.7)
+          .to('.sky-stars',{opacity:1,duration:1.5},2.4)
+          .to('.sun-glow',{opacity:0,duration:.3},1.8)
+          .to('.orb-sun',{opacity:0,duration:.3},1.8)
+          .to('.moon-glow',{opacity:1,duration:.4},2.2)
+          .to('.orb-moon',{opacity:1,duration:.4},2.2)
+        ScrollTrigger.create({trigger:'.st-maghrib',start:'top top',end:'+=120%',pin:true,anticipatePin:1})
+      },root)
+    }
+    return()=>{window.removeEventListener('resize',onResize);if(ctx)ctx.revert()}
+  },[root])
+}
+
+function IftarStory(){
+  const root=useRef(null)
+  const maghrib=useMaghrib()
+  useMotion(root,false)
+  useIftarMotion(root)
+  return <main ref={root} className="story">
+    <Nav/>
+    <div className="sky-stage" aria-hidden="true">
+      <div className="sky-sheet s-golden"/>
+      <div className="sky-sheet s-sunset"/>
+      <div className="sky-sheet s-maghrib"/>
+      <div className="sky-sheet s-dusk"/>
+      <div className="sky-sheet s-night"/>
+      <div className="sky-stars">{STARS.map((st,i)=><i key={i} style={{left:st.left+'%',top:st.top+'%',width:st.s,height:st.s,opacity:st.o}}/>)}</div>
+      <div className="sky-body">
+        <span className="sun-glow"/>
+        <span className="orb-sun"/>
+        <span className="moon-glow"/>
+        <svg className="orb-moon" viewBox="0 0 48 48" aria-hidden="true">
+          <defs><mask id="mooncut"><rect width="48" height="48" fill="#fff"/><circle cx="31" cy="19" r="15" fill="#000"/></mask></defs>
+          <circle cx="24" cy="24" r="15" fill="#f2ead8" mask="url(#mooncut)"/>
+          <path d="M36 28l1.8 4.2 4.2 1.8-4.2 1.8-1.8 4.2-1.8-4.2-4.2-1.8 4.2-1.8z" fill="#f2ead8"/>
+        </svg>
+      </div>
+      <svg className="sky-line" viewBox="0 0 1440 160" preserveAspectRatio="none" aria-hidden="true">
+        <rect x="180" y="6" width="6" height="62" fill="#141a1f"/>
+        <rect x="1254" y="6" width="6" height="62" fill="#141a1f"/>
+        <path d="M0 160L0 98Q360 42 720 42Q1080 42 1440 98L1440 160Z" fill="#141a1f"/>
+      </svg>
+    </div>
+    <div className="story-content">
+      <header className="story-sec st-hero">
+        <div className="story-narrow story-inner">
+          <span className="story-kicker">A Bazram Merdeka story</span>
+          <h1>The Iftar Hour.</h1>
+          <p>How one evening at Stadium Merdeka slows down, glows, and stops together at Maghrib.</p>
+          <div className="story-meta"><span>21 Feb–18 Mar</span><span>4 PM–11 PM</span><span>Free entry</span></div>
+          <a className="scroll-cue" href="#st-wait">Scroll — the sky keeps time ↓</a>
+        </div>
+      </header>
+      <section id="st-wait" className="story-sec st-wait">
+        <div className="story-narrow"><div className="story-card" data-reveal>
+          <span className="story-kicker">The wait</span>
+          <h2>Come early. Take your time.</h2>
+          <p>Walk the food lanes, pick your drinks, find a spot on the field. The bazaar is at its best before the rush, and the sky will tell you how long you have.</p>
+          <div className="count-chip"><b>{maghrib?maghrib.label:'Maghrib'}</b><span>{maghrib?maghrib.sub:'this evening · Kuala Lumpur'}</span></div>
+        </div></div>
+      </section>
+      <section className="story-sec st-maghrib">
+        <div className="story-narrow story-inner" data-reveal>
+          <span className="story-kicker">At Maghrib</span>
+          <h2 className="peak-line">The whole stadium pauses together.</h2>
+          <p>Thousands settle onto the field with their food, and for one moment everything in Kuala Lumpur goes quiet at the same time.</p>
+        </div>
+      </section>
+      <section className="story-sec st-dusk">
+        <div className="story-narrow"><div className="story-card" data-reveal>
+          <span className="story-kicker">After iftar</span>
+          <h2>The night opens up.</h2>
+          <div className="story-schedule">{programme.map(([time,title,copy])=><div className="schedule-row" key={time}><time>{time}</time><div><b>{title}</b><p>{copy}</p></div></div>)}</div>
+          <a className="text-link" href="/programme">Full programme ↗</a>
+        </div></div>
+      </section>
+      <section className="story-sec st-night">
+        <div className="story-narrow"><div className="story-card" data-reveal>
+          <span className="story-kicker">Stay for the night</span>
+          <h2>Under a risen moon.</h2>
+          <p>Prayer, dessert, a second round through the bazaar. The evening carries on around the stadium until 11 PM.</p>
+          <div className="story-actions"><a className="button primary" href="/visit">Plan your visit ↗</a><a className="button secondary" href="https://maps.google.com/?q=Stadium+Merdeka+Kuala+Lumpur" target="_blank" rel="noreferrer">Directions ↗</a></div>
+        </div></div>
+      </section>
+      <Footer/>
+    </div>
+  </main>
+}
 
 function Home(){
   const root=useRef(null)
@@ -148,7 +298,7 @@ function Home(){
 
     <section id="experience" className="experience"><div className="shell" data-reveal><header className="section-title"><h2>Before Maghrib, take your time.</h2><p>Choose a moment below to see what the evening feels like.</p></header><div className="experience-tabs" role="tablist">{journey.map((item,i)=><button role="tab" aria-selected={i===active} className={i===active?'active':''} onClick={()=>select(i)} key={item.title}>{item.title}</button>)}</div><div className="experience-feature"><div className="experience-image"><Img src={journey[active].image} alt={journey[active].title}/></div><div className="experience-copy"><span>{journey[active].time}</span><h3>{journey[active].headline}</h3><p>{journey[active].copy}</p>{active===1&&<a href="/food">Explore food ↗</a>}{active===3&&<a href="/programme">See what’s on ↗</a>}</div></div></div></section>
 
-    <section id="iftar" className="iftar cinematic" style={{backgroundImage:`url(${IMAGES.hero})`}}><div className="iftar-overlay"/><div className="shell iftar-text" data-reveal><span>At Maghrib</span><h2>The whole stadium pauses together.</h2><p>Visitors gather on the field, settle in with their food and wait for the same moment.</p></div></section>
+    <section id="iftar" className="iftar cinematic" style={{backgroundImage:`url(${IMAGES.hero})`}}><div className="iftar-overlay"/><div className="shell iftar-text" data-reveal><span>At Maghrib</span><h2>The whole stadium pauses together.</h2><p>Visitors gather on the field, settle in with their food and wait for the same moment.</p><a className="text-link light" href="/iftar">Experience the iftar hour ↓</a></div></section>
 
     <section className="after"><div className="shell after-layout" data-reveal><div className="after-photo"><Img src={IMAGES.crowd} alt="Bazram Merdeka after dark"/></div><div className="after-copy"><h2>Stay after iftar.</h2><p>The evening carries on naturally. Pray, grab dessert, walk the bazaar again or see what is happening around the stadium.</p><div className="after-links"><a href="/visit#prayer">Prayer information ↗</a><a href="/food">Dessert & drinks ↗</a><a href="/programme">Evening programme ↗</a></div></div></div></section>
 
@@ -172,5 +322,5 @@ function VendorsPage(){return <PageShell title="Book a stall at Bazram Merdeka."
 function NotFound(){return <main><Nav/><section className="notfound"><img src={LOGO} alt="Bazram Merdeka"/><h1>Page not found.</h1><a className="button primary" href="/">Back home</a></section></main>}
 
 const path=window.location.pathname.replace(/\/+$/,'')||'/'
-const Page=path==='/'?Home:path==='/food'?FoodPage:path==='/programme'?ProgrammePage:path==='/visit'?VisitPage:path==='/vendors'?VendorsPage:NotFound
+const Page=path==='/'?Home:path==='/iftar'?IftarStory:path==='/food'?FoodPage:path==='/programme'?ProgrammePage:path==='/visit'?VisitPage:path==='/vendors'?VendorsPage:NotFound
 createRoot(document.getElementById('root')).render(<Page/>)
