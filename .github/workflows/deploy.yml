@@ -20,6 +20,6 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: bazram-merdeka-visualize
+          projectName: bazram-merdeka
           directory: dist
           branch: main
